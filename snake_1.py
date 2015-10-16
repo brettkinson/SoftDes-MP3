@@ -13,6 +13,7 @@ import pygame
 import random
 import math
 import time
+import sys
 
 pygame.init()
 
@@ -26,7 +27,14 @@ background = background.convert() # improve blitting
 screen.blit(background, (0, 0))
 
 running = True
+FPS = 30 #set max frame rate
+total_time = 0.0 #initialize total play time counter
+clock = pygame.time.Clock()
+
 while running:
+	milliseconds = clock.tick(FPS) 
+	total_time += milliseconds / 1000.0 
+
 	for event in pygame.event.get():
 	    if event.type == pygame.QUIT: 
 	        running = False # window closed
@@ -34,4 +42,9 @@ while running:
 	        if event.key == pygame.K_ESCAPE:
 	            running = False # ESC pressed event
 
+	text = "FPS: {0:.2f}   Playtime: {1:.2f}".format(clock.get_fps(), total_time)
+	pygame.display.set_caption(text)
+	pygame.display.flip()
+
 pygame.quit()
+sys.exit()
