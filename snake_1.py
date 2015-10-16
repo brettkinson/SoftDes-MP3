@@ -6,7 +6,7 @@
 #### Software Design FA'15
 
 """
-First itereation of Snake for Mini Project 3
+First itereation of Snake Game for Mini Project 3
 """
 
 import pygame
@@ -26,6 +26,11 @@ background = background.convert() # improve blitting
 
 screen.blit(background, (0, 0))
 
+snake_head = pygame.Surface((20,20))
+pygame.draw.rect(snake_head,(133,192,122),(0,0,20,20),0)
+
+screen.blit(snake_head, (0,0))
+
 running = True
 FPS = 30 #set max frame rate
 total_time = 0.0 #initialize total play time counter
@@ -34,6 +39,8 @@ clock = pygame.time.Clock()
 while running:
 	milliseconds = clock.tick(FPS) 
 	total_time += milliseconds / 1000.0 
+
+	pygame.draw.rect(background,(0,0,0),(300,200,40,40),0)
 
 	for event in pygame.event.get():
 	    if event.type == pygame.QUIT: 
