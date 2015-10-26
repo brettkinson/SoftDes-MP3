@@ -16,49 +16,75 @@ import random
 
 
 
-class SnakeWorld:
-	screen_size = (640,480)
-	screen = pygame.display.set_mode(screen_size) # set window size
+class SnakeWorld(object):
+	def __init__(self):
 
-	background = pygame.Surface(screen.get_size()) # generate empty pygame surface
-	background.fill((255,255,255)) # background color fill
-	background = background.convert() # improve blitting
+		self.xlocal = [] #initialize lists to store head locations 
+		self.ylocal = []
+		self.tail = [] #list to keep track of number of tails
 
-	screen.blit(background, (0, 0))
+		self.head = SnakeHead((0,255,0),(10,10),320,240,0,10)
+		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),(10,10),random.randint(10,630),random.randint(10,470))
+		self.headRect = pygame.Rect(self.head.x,self.head.y,self.head.width,self.head.height)
+		self.foodRect = pygame.Rect(self.food.x,self.food.y,self.food.width,self.food.height)
 
-	snake_head = pygame.Surface((20,20))
+	def update(self):
+		self.xlocal.append(self.head.x)
+		self.ylocal.append(self.head.y)
+		self.head.update()
+		self.headRect = pygame.Rect(self.head.x,self.head.y,self.head.width,self.head.height)
 
-	screen.blit(snake_head, (0,0))
+		if self.headRect.colliderect(self.foodRect):
+			self.food.update(random.randint(10,630),random.randint(10,470))
+			tail = Tail((0,255,0),10,10,self.head.x,self.head.y)
+			self.tails.append(tail)
+		else:
+			pass
+			
+	def check_dead(self):
+		for t in self.tail:
+			pass
 
-
-
-class SnakeHead:
-	def __init__(self,color,size,x,y,vx,vy):
+class SnakeHead(object):
+	def __init__(self,color,x,y,width,height,vx,vy):
 		self.color = color
-		self.size = size
 		self.x = x
 		self.y = y
+		self.width = width
+		self.height = height
 		self.vx = vx
 		self.vy = vy
 
+	def update(self):
+		self.x += self.vx
+		self.y += self.vy
 
-class SnakeTail:
-	def __init__(self,color,size,x,y):
+
+class SnakeTail(object):
+	def __init__(self,color,x,y,width,height):
 		self.color = color
 		self.size = size
 		self.x = x
 		self.y = y
+		self.width = width
+		self.height = height
 
 
-class Food:
-	def __init__(self,color,size,x,y):
+class Food(object):
+	def __init__(self,color,x,y,width,height):
 		self.color = color
 		self.size = size
 		self.x = x
 		self.y = y
+		self.width = width
+		self.height = height
+
+	def update(self,x_new,y_new):
+		self.x = x_new
+		self.y = y_new
 
 
-class PyGameWindow:
+class PyGameWindow(object):
 	def __init__(self,screen,world):
 		screen_size = (640,480)
 		screen = pygame.display.set_mode(screen_size) # set window size
@@ -71,15 +97,9 @@ class PyGameWindow:
 		screen.blit(background, (0, 0))
 
 
-class GameController:
+class GameController(object):
 	def __init__(self,world):
 		self.world = world
-		
-	def collide(x1, x2, y1, y2, w1, w2, h1, h2):  #Collision Test using Bounded Box Testing
-		if x1 + w1 > x2 and x2 + w2 > x1 and y1 + h1 > y2 and y2 + h2 > y1:  #test if the position of the snake head falls within the rect designating the food
-			return True
-		else:
-			return False
 	    
 	def keyboard_event(self,event):
 		if event.type == pygame.QUIT: 
@@ -116,8 +136,7 @@ class GameController:
 		    	else:
 		    		self.world.head.vx = -10
 		    		self.world.head.vy = 0
-		        	
-
+	
 
 if __name__ == '__main__':
 	pygame.init()
@@ -132,7 +151,7 @@ if __name__ == '__main__':
 	FPS = 30 #set max frame rate
 	total_time = 0.0 #initialize total play time counter
 	clock = pygame.time.Clock()
-
+  
 
 	while running:
 		milliseconds = clock.tick(FPS) 
