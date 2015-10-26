@@ -16,15 +16,15 @@ import random
 
 
 
-class SnakeWorld(object):
+class SnakeWorld():
 	def __init__(self):
 
 		self.xlocal = [] #initialize lists to store head locations 
 		self.ylocal = []
 		self.tail = [] #list to keep track of number of tails
 
-		self.head = SnakeHead((0,255,0),(10,10),320,240,0,10)
-		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),(10,10),random.randint(10,630),random.randint(10,470))
+		self.head = SnakeHead((0,255,0),320,240,10,10,0,10)
+		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),10,10,random.randint(10,630),random.randint(10,470))
 		self.headRect = pygame.Rect(self.head.x,self.head.y,self.head.width,self.head.height)
 		self.foodRect = pygame.Rect(self.food.x,self.food.y,self.food.width,self.food.height)
 
@@ -45,7 +45,7 @@ class SnakeWorld(object):
 		for t in self.tail:
 			pass
 
-class SnakeHead(object):
+class SnakeHead():
 	def __init__(self,color,x,y,width,height,vx,vy):
 		self.color = color
 		self.x = x
@@ -60,7 +60,7 @@ class SnakeHead(object):
 		self.y += self.vy
 
 
-class SnakeTail(object):
+class SnakeTail():
 	def __init__(self,color,x,y,width,height):
 		self.color = color
 		self.size = size
@@ -69,11 +69,14 @@ class SnakeTail(object):
 		self.width = width
 		self.height = height
 
+	def update(self,xlocal,ylocal):
+		self.x = xlocal
+		self.y = ylocal
 
-class Food(object):
+
+class Food():
 	def __init__(self,color,x,y,width,height):
 		self.color = color
-		self.size = size
 		self.x = x
 		self.y = y
 		self.width = width
@@ -84,7 +87,7 @@ class Food(object):
 		self.y = y_new
 
 
-class PyGameWindow(object):
+class PyGameWindow():
 	def __init__(self,screen,world):
 		screen_size = (640,480)
 		screen = pygame.display.set_mode(screen_size) # set window size
@@ -97,45 +100,41 @@ class PyGameWindow(object):
 		screen.blit(background, (0, 0))
 
 
-class GameController(object):
+class GameController():
 	def __init__(self,world):
 		self.world = world
 	    
 	def keyboard_event(self,event):
-		if event.type == pygame.QUIT: 
-		    running = False #window closed
+		if event.key == pygame.K_ESCAPE:
+			running = False #ESC pressed event
 
-		elif event.type == pygame.KEYDOWN:
-		    if event.key == pygame.K_ESCAPE:
-		        running = False #ESC pressed event
+		elif event.key == pygame.K_UP:
+			if self.world.head.vx == 0 and self.world.head.vy == 10:
+				return
+			else:
+				self.world.head.vx = 0
+				self.world.head.vy = 10
 
-		    elif event.key == pygame.K_UP:
-		    	if self.world.head.vx == 0 and self.world.head.vy == 10:
-		    		return
-		    	else:
-		    		self.world.head.vx = 0
-		    		self.world.head.vy = 10
+		elif event.key == pygame.K_DOWN:
+			if self.world.head.vx == 0 and self.world.head.vy == -10:
+				return
+			else:
+				self.world.head.vx = 0
+				self.world.head.vy = -10
 
-		    elif event.key == pygame.K_DOWN:
-		    	if self.world.head.vx == 0 and self.world.head.vy == -10:
-		    		return
-		    	else:
-		    		self.world.head.vx = 0
-		    		self.world.head.vy = -10
+		elif event.key == pygame.K_RIGHT:
+			if self.world.head.vx == 10 and self.world.head.vy == 0:
+				return
+			else:
+				self.world.head.vx = 10
+				self.world.head.vy = 0
 
-		    elif event.key == pygame.K_RIGHT:
-		    	if self.world.head.vx == 10 and self.world.head.vy == 0:
-		    		return
-		    	else:
-		    		self.world.head.vx = 10
-		    		self.world.head.vy = 0
-
-		    elif event.key == pygame.K_LEFT:
-		    	if self.world.head.vx == -10 and self.world.head.vy == 0:
-		    		return
-		    	else:
-		    		self.world.head.vx = -10
-		    		self.world.head.vy = 0
+		elif event.key == pygame.K_LEFT:
+			if self.world.head.vx == -10 and self.world.head.vy == 0:
+				return
+			else:
+				self.world.head.vx = -10
+				self.world.head.vy = 0
 	
 
 if __name__ == '__main__':
@@ -161,10 +160,12 @@ if __name__ == '__main__':
 		pygame.display.set_caption(text)
 		pygame.display.flip()
 
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+			if event.type == pygame.KEYDOWN:
+				controller.handle_keyboard_event(event)
 
-		pygame.draw.rect(background,(0,0,0),(300,200,40,40),0)
-		pygame.draw.rect(snake_head,(133,192,122),(0,0,20,20),0)
-
-		
+			
 	pygame.quit()
 	sys.exit()
