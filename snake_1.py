@@ -43,7 +43,7 @@ class SnakeWorld():
 			
 	def check_dead(self):
 		for t in self.tail:
-			pass
+			if self.headRect.colliderect(self.tail[
 
 class SnakeHead():
 	def __init__(self,color,x,y,width,height,vx,vy):
