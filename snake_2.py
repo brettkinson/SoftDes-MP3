@@ -24,7 +24,7 @@ class SnakeWorld():
 		self.tails = [] #list to keep track of number of tails
 
 		self.head = SnakeHead((0,255,0),320,240,10,10,0,10)
-		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),10,10,random.randint(10,630),random.randint(10,470))
+		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),random.randint(10,630),random.randint(10,470),10,10)
 		self.headRect = pygame.Rect(self.head.x,self.head.y,self.head.width,self.head.height)
 		self.foodRect = pygame.Rect(self.food.x,self.food.y,self.food.width,self.food.height)
 
@@ -36,7 +36,7 @@ class SnakeWorld():
 
 		if self.headRect.colliderect(self.foodRect):
 			self.food.update(random.randint(10,630),random.randint(10,470))
-			tail = SnakeTail((0,255,0),10,10,self.head.x,self.head.y)
+			tail = SnakeTail((0,255,0),self.head.x,self.head.y,10,10)
 			self.tails.append(tail)
 		else:
 			pass
