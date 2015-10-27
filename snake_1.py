@@ -19,9 +19,9 @@ import random
 class SnakeWorld():
 	def __init__(self):
 
-		self.xlocal = [] #initialize lists to store head locations 
+		self.xlocal = [] #initialize lists to store head locations
 		self.ylocal = []
-		self.tail = [] #list to keep track of number of tails
+		self.tails = [] #list to keep track of number of tails
 
 		self.head = SnakeHead((0,255,0),320,240,10,10,0,10)
 		self.food = Food((random.randint(0,255),random.randint(0,255),random.randint(0,255)),10,10,random.randint(10,630),random.randint(10,470))
@@ -36,7 +36,7 @@ class SnakeWorld():
 
 		if self.headRect.colliderect(self.foodRect):
 			self.food.update(random.randint(10,630),random.randint(10,470))
-			tail = Tail((0,255,0),10,10,self.head.x,self.head.y)
+			tail = SnakeTail((0,255,0),10,10,self.head.x,self.head.y)
 			self.tails.append(tail)
 		else:
 			pass
@@ -63,7 +63,6 @@ class SnakeHead():
 class SnakeTail():
 	def __init__(self,color,x,y,width,height):
 		self.color = color
-		self.size = size
 		self.x = x
 		self.y = y
 		self.width = width
@@ -88,16 +87,21 @@ class Food():
 
 
 class PyGameWindow():
-	def __init__(self,screen,world):
+	def __init__(self,world):
 		screen_size = (640,480)
-		screen = pygame.display.set_mode(screen_size) # set window size
-		self.screen = screen
+		self.screen = pygame.display.set_mode(screen_size) #set window size
+		self.world = world
 
 	def generate(self):
-		background = self.screen # generate empty pygame surface
-		background.fill((255,255,255)) # background color fill
-		background = background.convert() # improve blitting
-		screen.blit(background, (0, 0))
+		self.screen.fill((255,255,255)) #background color fill
+		#self.screen = self.screen.convert() #improve blitting
+		self.screen.blit(self.screen, (0, 0))
+		for item in self.world.tails:
+			pygame.draw.rect(self.screen, pygame.Color(item.color[0],item.color[1],item.color[2]),pygame.Rect(item.x,item.y,item.width,item.height))
+		pygame.draw.rect(self.screen, pygame.Color(self.world.food.color[0],self.world.food.color[1],self.world.food.color[2]),pygame.Rect(self.world.food.x,self.world.food.y,self.world.food.width,self.world.food.height))
+		pygame.draw.rect(self.screen, pygame.Color(self.world.head.color[0],self.world.head.color[1],self.world.head.color[2]),pygame.Rect(self.world.head.x,self.world.head.y,self.world.head.width,self.world.head.height))
+		for item in self.world.tails:
+			pygame.draw.rect(self.screen, pygame.Color(item.color[0],item.color[1],item.color[2]),pygame.Rect(item.x,item.y,item.width,item.height))
 
 
 class GameController():
@@ -109,18 +113,18 @@ class GameController():
 			running = False #ESC pressed event
 
 		elif event.key == pygame.K_UP:
-			if self.world.head.vx == 0 and self.world.head.vy == 10:
-				return
-			else:
-				self.world.head.vx = 0
-				self.world.head.vy = 10
-
-		elif event.key == pygame.K_DOWN:
 			if self.world.head.vx == 0 and self.world.head.vy == -10:
 				return
 			else:
 				self.world.head.vx = 0
 				self.world.head.vy = -10
+
+		elif event.key == pygame.K_DOWN:
+			if self.world.head.vx == 0 and self.world.head.vy == 10:
+				return
+			else:
+				self.world.head.vx = 0
+				self.world.head.vy = 10
 
 		elif event.key == pygame.K_RIGHT:
 			if self.world.head.vx == 10 and self.world.head.vy == 0:
@@ -140,11 +144,12 @@ class GameController():
 if __name__ == '__main__':
 	pygame.init()
 
-	screen_size = (640,480)
-	screen = pygame.display.set_mode(screen_size) #set window size
+	#screen_size = (640,480)
+	#screen = pygame.display.set_mode(screen_size) #set window size
 	world = SnakeWorld()
 	controller = GameController(world)
-	game_view = PyGameWindow(screen,world)
+	game_view = PyGameWindow(world)
+	game_view.generate()
 
 	running = True #initialize game state
 	FPS = 30 #set max frame rate
@@ -164,7 +169,12 @@ if __name__ == '__main__':
 			if event.type == pygame.QUIT:
 				running = False
 			if event.type == pygame.KEYDOWN:
-				controller.handle_keyboard_event(event)
+				controller.keyboard_event(event)
+
+		game_view.generate()
+		world.update() 
+		time.sleep(.1)
+		pygame.display.flip()
 
 			
 	pygame.quit()
